@@ -9,7 +9,7 @@ def main():
         for ev in pg.event.get():
             if ev.type == pg.QUIT:
                 viz.running = False
-            if ev.type == pg.MOUSEBUTTONUP:
+            if ev.type == pg.MOUSEBUTTONUP and izvrsen == False:
                 viz.obojKvadrat()
             if ev.type==pg.KEYDOWN:
                 if ev.key==pg.K_RETURN:
