@@ -1,6 +1,15 @@
 import pygame as pg
 
+### Korisnicke Promenjive ###
 (visina, sirina) = (600, 600)
+boje = { "bojaPKvadrata": (50, 168, 82),
+         "bojaKKvadrata": (168, 64, 50),
+         "bojaGrida": (0, 0, 0),
+         "bojaPrepreke": (0, 0, 0),
+         "bojaPuta": (212, 203, 30)}
+velicinaKvadrata = 20
+##############################
+
 running = True
 kvadrati = []
 pozicijeObojenihKvadrata = []
@@ -10,39 +19,44 @@ pg.init()
 ekran = pg.display.set_mode((visina, sirina))
 ekran.fill(pg.Color("white"))
 
+def reset():
+    global nacrtanPocetak, nacrtanKraj
+    ekran.fill(pg.Color("white"))
+    kvadrati.clear()
+    pozicijeObojenihKvadrata.clear()
+    nacrtanPocetak = False
+    nacrtanKraj = False
+    nacrtajGrid()
 
 def nacrtajGrid():
     global pozicijeKvadrata
-    velicinaKvadrata = 20
-    bojaKvadrata = (0, 0, 0)
     for x in range(sirina // velicinaKvadrata):
         for y in range(visina // velicinaKvadrata):
             rect = pg.Rect(x * velicinaKvadrata, y * velicinaKvadrata,
                            velicinaKvadrata, velicinaKvadrata)
             kvadrati.append(rect)
-            pg.draw.rect(ekran, bojaKvadrata, rect, 1)
+            pg.draw.rect(ekran, boje["bojaGrida"], rect, 1)
 
 
 
 def obojKvadrat():
     global  nacrtanPocetak, nacrtanKraj, pozicijeObojenihKvadrata
-    bojaPKvadrata = (0,255,0)
-    bojaKKvadrata = (0,0,255)
     posMisa = pg.mouse.get_pos()
 
     for kvadrat in kvadrati:
         if kvadrat.collidepoint(posMisa):
             if nacrtanPocetak == False:
-                bojaKvadrata = bojaPKvadrata
+                bojaKvadrata = boje["bojaPKvadrata"]
                 nacrtanPocetak = True
             elif nacrtanKraj == False:
-                bojaKvadrata = bojaKKvadrata
+                bojaKvadrata = boje["bojaKKvadrata"]
                 nacrtanKraj = True
             else:
-                bojaKvadrata = (0,0,0)
+                bojaKvadrata = boje["bojaPrepreke"]
             pg.draw.rect(ekran, bojaKvadrata, kvadrat, 0)
             pozicijeObojenihKvadrata.append(kvadrat)
 
-def obojiNode(rect, color):
-    pg.draw.rect(ekran, color, rect, 0)  
+def obojiPut(put):
+    for rect in put:
+        pg.draw.rect(ekran, boje["bojaPuta"], rect, 0)  
 
