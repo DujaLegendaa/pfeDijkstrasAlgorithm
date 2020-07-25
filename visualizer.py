@@ -1,4 +1,5 @@
 import pygame as pg
+import pygamebg as pgb
 
 ### Korisnicke Promenjive ###
 (visina, sirina) = (600, 600)
@@ -6,7 +7,9 @@ boje = { "bojaPKvadrata": (50, 168, 82),
          "bojaKKvadrata": (168, 64, 50),
          "bojaGrida": (0, 0, 0),
          "bojaPrepreke": (0, 0, 0),
-         "bojaPuta": (212, 203, 30)}
+         "bojaPuta": (212, 203, 30),
+         "radnaBoja": (66, 147, 245),
+         "bojaTrenutna": (245, 47, 50)}
 velicinaKvadrata = 20
 ##############################
 
@@ -56,7 +59,20 @@ def obojKvadrat():
             pg.draw.rect(ekran, bojaKvadrata, kvadrat, 0)
             pozicijeObojenihKvadrata.append(kvadrat)
 
-def obojiPut(put):
-    for rect in put:
-        pg.draw.rect(ekran, boje["bojaPuta"], rect, 0)  
+
+def obojiPut(put, i, bPut):
+    if(bPut == True):
+        boja = boje["radnaBoja"]
+    else:
+        boja = boje["bojaPuta"]
+    if(i < len(put)):
+        pg.draw.rect(ekran, boja, put[i - 1], 0)
+        pg.draw.rect(ekran, boje["bojaGrida"], put[i - 1], 1)
+        pg.draw.rect(ekran, boje["bojaTrenutna"], put[i], 0)
+        return i + 1
+    else:
+        if(bPut == False):
+            pg.draw.rect(ekran, boja, put[i-1],0)
+            pg.draw.rect(ekran, boje["bojaGrida"], put[i - 1], 1)
+        return -1
 

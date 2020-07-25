@@ -3,6 +3,9 @@ import algoritam as alg
 import pygame as pg
 
 def main():
+    i = 2
+    k = 0
+    (put, predjeniNodeovi) = (None, None)
     viz.nacrtajGrid()
     izvrsen = False
     while viz.running == True:
@@ -14,12 +17,21 @@ def main():
             if ev.type==pg.KEYDOWN:
                 if ev.key==pg.K_RETURN:
                         if izvrsen == False:
-                            viz.obojiPut(alg.dijkatras())
+                            (put, predjeniNodeovi) = alg.dijkatras()
                             izvrsen = True
                         else:
                             viz.reset()
+                            i = 2
+                            k = 1
+                            (put, predjeniNodeovi) = (None, None)
                             izvrsen = False
+        if((predjeniNodeovi != None) and (i == 1 or i != -1)):
+            i = viz.obojiPut(predjeniNodeovi, i, True)
+        if(i == -1 and put != None and (k == 0 or k!= -1)):
+            k = viz.obojiPut(put, k, False)
+        pg.time.Clock().tick(30)
         pg.display.update()
+
 
 main()
     
