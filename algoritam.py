@@ -18,7 +18,7 @@ class Node:
 
 
 horizontalnaVertikalnaDistanca = 1.0
-diagonalnaDistanca = 1.4
+diagonalnaDistanca = 1.0
 
 
 
@@ -29,6 +29,7 @@ def dijkatras():
     
     nodeGrid2d = kreirajGridNoda(brojKvadrata)
     velicina = len(nodeGrid2d)
+    pregeledaniNodeovi = []
 
     (pocetak, kraj) = korisnickiUnetiKvadrati(nodeGrid2d, pozicijeSvihKvadrata, pozicijeUnetihKvadrata, brojKvadrata)
     pocetak.distanca = 0
@@ -37,8 +38,9 @@ def dijkatras():
     heapq.heapify(priorityQueue)
 
     heapq.heappush(priorityQueue, pocetak)
+    trenutniNode = Node(-1, -1)
 
-    while len(priorityQueue) > 0:
+    while (len(priorityQueue) > 0) and (trenutniNode != kraj):
         trenutniNode = heapq.heappop(priorityQueue)
         tempNode = None
 
@@ -55,7 +57,7 @@ def dijkatras():
                 nodeLogic(tempNode, trenutniNode, diagonalnaDistanca, priorityQueue)
 
             #dole levo
-            if trenutniNode.x - 1 > 0:
+            if trenutniNode.x - 1 >= 0:
                 tempNode = nodeGrid2d[trenutniNode.x - 1][trenutniNode.y + 1]
                 nodeLogic(tempNode, trenutniNode, diagonalnaDistanca, priorityQueue)
 
@@ -72,7 +74,7 @@ def dijkatras():
                 nodeLogic(tempNode, trenutniNode, diagonalnaDistanca, priorityQueue)
 
             #gore levo
-            if trenutniNode.x - 1 > 0:
+            if trenutniNode.x - 1 >= 0:
                 tempNode = nodeGrid2d[trenutniNode.x - 1][trenutniNode.y - 1]
                 nodeLogic(tempNode, trenutniNode, diagonalnaDistanca, priorityQueue)
 
@@ -82,14 +84,14 @@ def dijkatras():
             nodeLogic(tempNode, trenutniNode, horizontalnaVertikalnaDistanca, priorityQueue)
 
         #levo
-        if trenutniNode.x - 1 > 0:
+        if trenutniNode.x - 1 >= 0:
             tempNode = nodeGrid2d[trenutniNode.x - 1][trenutniNode.y]
             nodeLogic(tempNode, trenutniNode, horizontalnaVertikalnaDistanca, priorityQueue)
 
         trenutniNode.pregledan = True
+        pregeledaniNodeovi.append(trenutniNode)
 
-    return nadjiPut(nodeGrid2d, kraj, pozicijeSvihKvadrata, brojKvadrata)
-    
+    return (nadjiPut(nodeGrid2d, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregeledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
 
 
 def nodeLogic(tempNode, trenutniNode, distanca, priorityQueue):
@@ -97,6 +99,12 @@ def nodeLogic(tempNode, trenutniNode, distanca, priorityQueue):
                     tempNode.distanca = trenutniNode.distanca + distanca
                     tempNode.roditelj = trenutniNode
                     heapq.heappush(priorityQueue, tempNode)
+
+def nodeToRect(nodeArr, pozicijeSvihKvadrata, brojKvadrata):
+    rectArr = []
+    for node in nodeArr:
+        rectArr.append(pozicijeSvihKvadrata[node.x * brojKvadrata + node.y])
+    return rectArr
 
 def nadjiPut(nodeGrid2d, kraj, pozicijeSvihKvadrata, brojKvadrata):
     put = []
