@@ -20,24 +20,45 @@ class Node:
 horizontalnaVertikalnaDistanca = 1.0
 diagonalnaDistanca = 1.4
 
-def jeValidna(i, j, brojKvadrata):
-    return (i >= 0 and i < brojKvadrata and j>=0 and j < brojKvadrata)
+def jeValidna(i, j, brojKvadrata, pregledan):
+    return (not pregledan and i >= 0 and i < brojKvadrata and j>=0 and j < brojKvadrata)
 
-pregeledaniNodeovi = []
+X = [0,1,0,-1];
+Y = [-1,0,1,0];
 
-def dfs(i, j, nodeGrid2d, brojKvadrata, kraj):
-    nodeGrid2d[i][j].pregledan = True
-    pregeledaniNodeovi.append(nodeGrid2d[i][j])
+def dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
+    pregledaniNodeovi = []
 
-    for k in range(0, 4):
-        dx = i + nodeGrid2d[i][j].x
-        dy = j + nodeGrid2d[i][j].y
+    nodesInNextLayer = 0
+    nodesLeftInLayer = 1
+    moveCount = 0
 
-        if(jeValidna(dx, dy, brojKvadrata) and nodeGrid2d[i][j] != kraj):
-            dfs(i, j, nodeGrid2d, brojKvadrata, kraj)
-    
-    
-    
+    priorityQueue = []
+    heapq.heapify(priorityQueue)
+
+    heapq.heappush(priorityQueue, pocetak)
+    trenutniNode = Node(-1, -1)
+    tempNode = None
+
+    while (tempNode != kraj and trenutniNode != kraj) and len(priorityQueue) > 0:
+        trenutniNode = heapq.heappop(priorityQueue)
+
+        for k in range(0, 4):
+            dx = trenutniNode.x + X[k]
+            dy = trenutniNode.y + Y[k]
+
+            if(dx >= 0 and dx < len(nodeGrid2d) and dy >= 0 and dy < len(nodeGrid2d)):
+                tempNode = nodeGrid2d[dx][dy]
+                if(not tempNode.pregledan and not tempNode.blokiran):
+                    tempNode.pregledan = True
+                    tempNode.roditelj = trenutniNode
+                    pregledaniNodeovi.append(tempNode)
+                    heapq.heappush(priorityQueue, tempNode)
+                    nodesInNextLayer += 1
+                    
+
+    return (None, nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
+
 
 def main():
     pozicijeUnetihKvadrata = viz.pozicijeObojenihKvadrata
@@ -51,9 +72,7 @@ def main():
     pocetak.distanca = 0
 
     #return dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
-    dfs(pocetak.x, pocetak.y, nodeGrid2d, brojKvadrata, kraj)
-
-    return (None, nodeToRect(pregeledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
+    return dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
 
 
 
