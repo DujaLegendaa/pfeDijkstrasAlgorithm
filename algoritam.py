@@ -2,6 +2,7 @@ import visualizer as viz
 import math
 import heapq
 import sys
+import queue
 
 class Node:
     def __init__(self, x, y):
@@ -26,22 +27,21 @@ def jeValidna(i, j, brojKvadrata, pregledan):
 X = [0,1,0,-1];
 Y = [-1,0,1,0];
 
-def dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
+def bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
     pregledaniNodeovi = []
 
-    nodesInNextLayer = 0
-    nodesLeftInLayer = 1
-    moveCount = 0
+    kju = queue.Queue(0)
 
-    priorityQueue = []
-    heapq.heapify(priorityQueue)
-
-    heapq.heappush(priorityQueue, pocetak)
+    kju.put(pocetak)
     trenutniNode = Node(-1, -1)
     tempNode = None
 
-    while (tempNode != kraj and trenutniNode != kraj) and len(priorityQueue) > 0:
-        trenutniNode = heapq.heappop(priorityQueue)
+    while kju.qsize() > 0:
+        trenutniNode = kju.get()
+
+        if trenutniNode is kraj or tempNode is kraj:
+            break
+        
 
         for k in range(0, 4):
             dx = trenutniNode.x + X[k]
@@ -49,15 +49,16 @@ def dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
 
             if(dx >= 0 and dx < len(nodeGrid2d) and dy >= 0 and dy < len(nodeGrid2d)):
                 tempNode = nodeGrid2d[dx][dy]
-                if(not tempNode.pregledan and not tempNode.blokiran):
+                if(tempNode.pregledan == False and tempNode.blokiran == False and '''tempNode.distanca > trenutniNode.distanca + horizontalnaVertikalnaDistanca'''):
+                    '''tempNode.distanca = trenutniNode.distanca + horizontalnaVertikalnaDistanca'''
                     tempNode.pregledan = True
                     tempNode.roditelj = trenutniNode
                     pregledaniNodeovi.append(tempNode)
-                    heapq.heappush(priorityQueue, tempNode)
-                    nodesInNextLayer += 1
+                    kju.put(tempNode)
+
                     
 
-    return (None, nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
 
 
 def main():
@@ -72,7 +73,7 @@ def main():
     pocetak.distanca = 0
 
     #return dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
-    return dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
+    return bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
 
 
 
@@ -100,6 +101,7 @@ def dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
             tempNode = nodeGrid2d[trenutniNode.x][trenutniNode.y - 1]
             nodeLogic(tempNode, trenutniNode, horizontalnaVertikalnaDistanca, priorityQueue)
 
+            
             #gore desno
             if trenutniNode.x + 1 < velicina:
                 tempNode = nodeGrid2d[trenutniNode.x + 1][trenutniNode.y - 1]
@@ -109,7 +111,7 @@ def dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
             if trenutniNode.x - 1 >= 0:
                 tempNode = nodeGrid2d[trenutniNode.x - 1][trenutniNode.y - 1]
                 nodeLogic(tempNode, trenutniNode, diagonalnaDistanca, priorityQueue)
-
+            
         #desno
         if trenutniNode.x + 1 < velicina:
             tempNode = nodeGrid2d[trenutniNode.x + 1][trenutniNode.y]
@@ -121,7 +123,7 @@ def dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
             #dole dole
             tempNode = nodeGrid2d[trenutniNode.x][trenutniNode.y + 1]
             nodeLogic(tempNode, trenutniNode, horizontalnaVertikalnaDistanca, priorityQueue)
-
+            
             #dole desno
             if trenutniNode.x + 1 < velicina:
                 tempNode = nodeGrid2d[trenutniNode.x + 1][trenutniNode.y + 1]
@@ -131,7 +133,7 @@ def dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
             if trenutniNode.x - 1 >= 0:
                 tempNode = nodeGrid2d[trenutniNode.x - 1][trenutniNode.y + 1]
                 nodeLogic(tempNode, trenutniNode, diagonalnaDistanca, priorityQueue)
-
+            
         #levo
         if trenutniNode.x - 1 >= 0:
             tempNode = nodeGrid2d[trenutniNode.x - 1][trenutniNode.y]
@@ -140,7 +142,7 @@ def dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
         trenutniNode.pregledan = True
         pregeledaniNodeovi.append(trenutniNode)
 
-    return (nadjiPut(nodeGrid2d, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregeledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregeledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
 
 def nodeLogic(tempNode, trenutniNode, distanca, priorityQueue):
     if tempNode.pregledan == False and (tempNode.blokiran == False ) and (tempNode.distanca > trenutniNode.distanca + distanca):
@@ -154,10 +156,10 @@ def nodeToRect(nodeArr, pozicijeSvihKvadrata, brojKvadrata):
         rectArr.append(pozicijeSvihKvadrata[node.x * brojKvadrata + node.y])
     return rectArr
 
-def nadjiPut(nodeGrid2d, kraj, pozicijeSvihKvadrata, brojKvadrata):
+def nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata):
     put = []
     trenutniNode = nodeGrid2d[kraj.x][kraj.y]
-    while trenutniNode.roditelj != None:
+    while trenutniNode != pocetak and trenutniNode.roditelj != None:
         put.append(pozicijeSvihKvadrata[trenutniNode.roditelj.x * brojKvadrata + trenutniNode.roditelj.y])
         trenutniNode = trenutniNode.roditelj
     put.pop()
