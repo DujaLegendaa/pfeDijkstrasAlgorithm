@@ -3,6 +3,7 @@ import algoritam as alg
 import pygame as pg
 
 def main():
+    FPS = 30;
     i = 2
     k = 0
     (put, predjeniNodeovi) = (None, None)
@@ -17,7 +18,7 @@ def main():
             if ev.type==pg.KEYDOWN:
                 if ev.key==pg.K_RETURN:
                         if izvrsen == False:
-                            (put, predjeniNodeovi) = alg.dijkatras()
+                            (put, predjeniNodeovi) = alg.main()
                             izvrsen = True
                         else:
                             viz.reset()
@@ -29,7 +30,7 @@ def main():
             i = viz.obojiPut(predjeniNodeovi, i, True)
         if(i == -1 and put != None and (k == 0 or k!= -1)):
             k = viz.obojiPut(put, k, False)
-        pg.time.Clock().tick(30)
+        pg.time.Clock().tick(FPS)
         pg.display.update()
 
 
