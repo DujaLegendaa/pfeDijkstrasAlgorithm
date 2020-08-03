@@ -8,28 +8,20 @@ class Node:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-
-    def __lt__(self, other):
-        return self.distanca < other.distanca
-
-    distanca = sys.maxsize
-    roditelj = None
-    pregledan = False
-    blokiran = False
-
-class GHFNode:
-    def __init__(self, noda):
-        self.x = noda.x
-        self.y = noda.y
-        self.roditelj = noda.roditelj
-        self.pregledan = noda.pregledan
-        self.blokiran = noda.blokiran
         self.g = 0
         self.h = 0
         self.f = 0
 
     def __lt__(self, other):
+        return self.distanca < other.distanca
+
+    def __lt__(self, other):
         return self.f < other.f
+
+    distanca = sys.maxsize
+    roditelj = None
+    pregledan = False
+    blokiran = False
     
 
 horizontalnaVertikalnaDistanca = 1.0
@@ -184,14 +176,9 @@ def dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
         
 def aStar(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
     pregledaniNodeovi = []
+
     otvoreneNodeQ = []
     heapq.heapify(otvoreneNodeQ)
-
-    pocetak = GHFNode(pocetak)
-    kraj = GHFNode(kraj)
-
-    print(pocetak, kraj)
-
     heapq.heappush(otvoreneNodeQ, pocetak)
 
     while len(otvoreneNodeQ) > 0:
@@ -219,7 +206,6 @@ def pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregleda
 
         if(dx >= 0 and dx < len(nodeGrid2d) and dy >= 0 and dy < len(nodeGrid2d)):
             tempNode = nodeGrid2d[dx][dy]
-            tempNode = GHFNode(tempNode)
             if tempNode.pregledan == False and tempNode.blokiran == False:
                 tempNode.pregledan = True
                 tempNode.roditelj = trenutniNode

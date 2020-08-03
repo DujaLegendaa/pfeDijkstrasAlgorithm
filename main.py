@@ -3,7 +3,7 @@ import algoritam as alg
 import pygame as pg
 
 def main():
-    FPS = 10;
+    FPS = 100;
     i = 2
     k = 0
     (put, predjeniNodeovi) = (None, None)
