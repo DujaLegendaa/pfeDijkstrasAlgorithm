@@ -41,7 +41,8 @@ def main():
     pocetak.distanca = 0
 
     #return dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
-    return bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
+    #return bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
+    return dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
 
 
 
@@ -150,6 +151,21 @@ def pregledajObliznjeNode(trenutniNode, nodeGrid2d, kraj, pregledaniNodeovi, kju
                 if tempNode is kraj:
                     return -1
 
+def dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
+    pregledaniNodeovi = []
+
+    kju = queue.LifoQueue(0)
+    kju.put(pocetak)
+    trenutniNode = Node(-1, -1)
+
+    while kju.qsize() > 0:
+        trenutniNode = kju.get()
+
+        if pregledajObliznjeNode(trenutniNode, nodeGrid2d, kraj, pregledaniNodeovi, kju) == -1:
+            break
+
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
+        
 
 
 def nodeToRect(nodeArr, pozicijeSvihKvadrata, brojKvadrata):
@@ -190,6 +206,7 @@ def korisnickiUnetiKvadrati(nodeGrid2d, pozicijeSvihKvadrata, pozicijeUnetihKvad
     for i in both:
         if both[0] == i:
             pocetak = nodeGrid2d[i[0] // brojKvadrata][i[0] % brojKvadrata]
+            pocetak.pregledan = True
         elif both[1] == i:
             kraj = nodeGrid2d[i[0] // brojKvadrata][i[0] % brojKvadrata]
         else:
