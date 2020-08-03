@@ -1,5 +1,4 @@
 import pygame as pg
-import pygamebg as pgb
 
 ### Korisnicke Promenjive ###
 (visina, sirina) = (600, 600)
