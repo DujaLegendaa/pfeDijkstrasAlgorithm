@@ -27,38 +27,6 @@ def jeValidna(i, j, brojKvadrata, pregledan):
 X = [0,1,0,-1];
 Y = [-1,0,1,0];
 
-def bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
-    pregledaniNodeovi = []
-
-    kju = queue.Queue(0)
-
-    kju.put(pocetak)
-    trenutniNode = Node(-1, -1)
-    tempNode = None
-
-    while kju.qsize() > 0:
-        trenutniNode = kju.get()
-
-        if trenutniNode is kraj or tempNode is kraj:
-            break
-        
-
-        for k in range(0, 4):
-            dx = trenutniNode.x + X[k]
-            dy = trenutniNode.y + Y[k]
-
-            if(dx >= 0 and dx < len(nodeGrid2d) and dy >= 0 and dy < len(nodeGrid2d)):
-                tempNode = nodeGrid2d[dx][dy]
-                if(tempNode.pregledan == False and tempNode.blokiran == False and '''tempNode.distanca > trenutniNode.distanca + horizontalnaVertikalnaDistanca'''):
-                    '''tempNode.distanca = trenutniNode.distanca + horizontalnaVertikalnaDistanca'''
-                    tempNode.pregledan = True
-                    tempNode.roditelj = trenutniNode
-                    pregledaniNodeovi.append(tempNode)
-                    kju.put(tempNode)
-
-                    
-
-    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
 
 
 def main():
@@ -149,6 +117,40 @@ def nodeLogic(tempNode, trenutniNode, distanca, priorityQueue):
                     tempNode.distanca = trenutniNode.distanca + distanca
                     tempNode.roditelj = trenutniNode
                     heapq.heappush(priorityQueue, tempNode)
+
+def bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
+    pregledaniNodeovi = []
+
+    kju = queue.Queue(0)
+    kju.put(pocetak)
+    trenutniNode = Node(-1, -1)
+
+    while kju.qsize() > 0:
+        trenutniNode = kju.get()
+        
+        if pregledajObliznjeNode(trenutniNode, nodeGrid2d, kraj, pregledaniNodeovi, kju) == -1:
+            break
+
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
+
+def pregledajObliznjeNode(trenutniNode, nodeGrid2d, kraj, pregledaniNodeovi, kju):
+    tempNode = None
+    for k in range(0, 4):
+            dx = trenutniNode.x + X[k]
+            dy = trenutniNode.y + Y[k]
+
+            if(dx >= 0 and dx < len(nodeGrid2d) and dy >= 0 and dy < len(nodeGrid2d)):
+                tempNode = nodeGrid2d[dx][dy]
+                if tempNode.pregledan == False and tempNode.blokiran == False:
+                    tempNode.pregledan = True
+                    tempNode.roditelj = trenutniNode
+                    pregledaniNodeovi.append(tempNode)
+                    kju.put(tempNode)
+
+                if tempNode is kraj:
+                    return -1
+
+
 
 def nodeToRect(nodeArr, pozicijeSvihKvadrata, brojKvadrata):
     rectArr = []
