@@ -17,6 +17,20 @@ class Node:
     pregledan = False
     blokiran = False
 
+class GHFNode:
+    def __init__(self, noda):
+        self.x = noda.x
+        self.y = noda.y
+        self.roditelj = noda.roditelj
+        self.pregledan = noda.pregledan
+        self.blokiran = noda.blokiran
+        self.g = 0
+        self.h = 0
+        self.f = 0
+
+    def __lt__(self, other):
+        return self.f < other.f
+    
 
 horizontalnaVertikalnaDistanca = 1.0
 diagonalnaDistanca = 1.4
@@ -42,7 +56,8 @@ def main():
 
     #return dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
     #return bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
-    return dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
+    #return dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
+    return aStar(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
 
 
 
@@ -137,19 +152,20 @@ def bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
 def pregledajObliznjeNode(trenutniNode, nodeGrid2d, kraj, pregledaniNodeovi, kju):
     tempNode = None
     for k in range(0, 4):
-            dx = trenutniNode.x + X[k]
-            dy = trenutniNode.y + Y[k]
+        dx = trenutniNode.x + X[k]
+        dy = trenutniNode.y + Y[k]
 
-            if(dx >= 0 and dx < len(nodeGrid2d) and dy >= 0 and dy < len(nodeGrid2d)):
-                tempNode = nodeGrid2d[dx][dy]
-                if tempNode.pregledan == False and tempNode.blokiran == False:
-                    tempNode.pregledan = True
-                    tempNode.roditelj = trenutniNode
-                    pregledaniNodeovi.append(tempNode)
-                    kju.put(tempNode)
+        if(dx >= 0 and dx < len(nodeGrid2d) and dy >= 0 and dy < len(nodeGrid2d)):
+            tempNode = nodeGrid2d[dx][dy]
+            if tempNode.pregledan == False and tempNode.blokiran == False:
+                tempNode.pregledan = True
+                tempNode.roditelj = trenutniNode
+                pregledaniNodeovi.append(tempNode)
+                kju.put(tempNode)
 
-                if tempNode is kraj:
-                    return -1
+            if tempNode is kraj:
+                return -1
+
 
 def dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
     pregledaniNodeovi = []
@@ -166,6 +182,60 @@ def dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
 
     return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
         
+def aStar(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
+    pregledaniNodeovi = []
+    otvoreneNodeQ = []
+    heapq.heapify(otvoreneNodeQ)
+
+    pocetak = GHFNode(pocetak)
+    kraj = GHFNode(kraj)
+
+    print(pocetak, kraj)
+
+    heapq.heappush(otvoreneNodeQ, pocetak)
+
+    while len(otvoreneNodeQ) > 0:
+        trenutniNode = heapq.heappop(otvoreneNodeQ)
+
+        print(trenutniNode)
+
+        if pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregledaniNodeovi, otvoreneNodeQ) == -1:
+            break
+
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
+
+def trebaDodati(tempNode, otvoreneNodeQ):
+    for noda in otvoreneNodeQ:
+        if noda == tempNode and tempNode.f >= noda.f:
+            return False
+    return True
+
+def pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregledaniNodeovi, kju):
+    tempNode = None
+
+    for k in range(0, 4):
+        dx = trenutniNode.x + X[k]
+        dy = trenutniNode.y + Y[k]
+
+        if(dx >= 0 and dx < len(nodeGrid2d) and dy >= 0 and dy < len(nodeGrid2d)):
+            tempNode = nodeGrid2d[dx][dy]
+            tempNode = GHFNode(tempNode)
+            if tempNode.pregledan == False and tempNode.blokiran == False:
+                tempNode.pregledan = True
+                tempNode.roditelj = trenutniNode
+                pregledaniNodeovi.append(tempNode)
+
+                tempNode.g = abs(tempNode.x - pocetak.x) + abs(tempNode.y - pocetak.y)
+                tempNode.h = abs(tempNode.x - kraj.x) + abs(tempNode.y - kraj.y)
+                tempNode.f = tempNode.g + tempNode.h
+
+                if trebaDodati(tempNode, kju):
+                    heapq.heappush(kju, tempNode)
+
+            if tempNode is kraj:
+                return -1
+
+
 
 
 def nodeToRect(nodeArr, pozicijeSvihKvadrata, brojKvadrata):
