@@ -25,11 +25,10 @@ class Node:
 
 horizontalnaVertikalnaDistanca = 1.0
 diagonalnaDistanca = 1.4
-X = [0,1,0,-1];
-Y = [-1,0,1,0];
+X = [-1,0,1,0];
+Y = [0 ,1,0,-1];
 
-
-def main(pozicijeObojenihKvadrata, kvadrati):
+def switchAlgoritma(index, pozicijeObojenihKvadrata, kvadrati):
     pozicijeUnetihKvadrata = pozicijeObojenihKvadrata
     pozicijeSvihKvadrata = kvadrati
     brojKvadrataUOsi = math.floor(math.sqrt(len(pozicijeSvihKvadrata)))
@@ -40,10 +39,17 @@ def main(pozicijeObojenihKvadrata, kvadrati):
     (pocetak, kraj) = korisnickiUnetiKvadrati(nodeGrid2d, pozicijeSvihKvadrata, pozicijeUnetihKvadrata, brojKvadrataUOsi)
     pocetak.distanca = 0
 
-    #return dijakstra(pocetak, kraj, nodeGrid2d, brojKvadrataUOsi, pozicijeSvihKvadrata)
-    return bfs(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
-    #return dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
-    #return aStar(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
+    if index == 0:
+        return bfs(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
+    elif index == 1:
+        return dfs(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
+    elif index == 2:
+        return dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
+    elif index == 3:
+        return aStar(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
+    else:
+        print("bad algorithm index")
+        return -1
 
 def dijakstra(pocetak, kraj, nodeGrid2d, brojKvadrataUOsi, pozicijeSvihKvadrata):
     velicina = len(nodeGrid2d)

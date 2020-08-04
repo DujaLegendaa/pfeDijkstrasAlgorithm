@@ -50,8 +50,4 @@ def obojKvadrat(kvadrati, ekran):
             pg.draw.rect(ekran, bojaKvadrata, kvadrat, 0)
             pozicijeObojenihKvadrata.append(kvadrat)
 
-    if len(pozicijeObojenihKvadrata) >= 2:
-        return pozicijeObojenihKvadrata
-    else:
-        return False
 

@@ -22,34 +22,6 @@ def reset():
     nacrtanKraj = False
     nacrtajGrid()
 
-def nacrtajGrid():
-    global pozicijeKvadrata
-    for x in range(sirina // velicinaKvadrata):
-        for y in range(visina // velicinaKvadrata):
-            rect = pg.Rect(x * velicinaKvadrata, y * velicinaKvadrata,
-                           velicinaKvadrata, velicinaKvadrata)
-            kvadrati.append(rect)
-            pg.draw.rect(ekran, boje["bojaGrida"], rect, 1)
-
-
-
-def obojKvadrat():
-    global  nacrtanPocetak, nacrtanKraj, pozicijeObojenihKvadrata
-    posMisa = pg.mouse.get_pos()
-
-    for kvadrat in kvadrati:
-        if kvadrat.collidepoint(posMisa):
-            if nacrtanPocetak == False:
-                bojaKvadrata = boje["bojaPKvadrata"]
-                nacrtanPocetak = True
-            elif nacrtanKraj == False:
-                bojaKvadrata = boje["bojaKKvadrata"]
-                nacrtanKraj = True
-            else:
-                bojaKvadrata = boje["bojaPrepreke"]
-            pg.draw.rect(ekran, bojaKvadrata, kvadrat, 0)
-            pozicijeObojenihKvadrata.append(kvadrat)
-
 
 def obojiPut(put, i, bPut, ekran):
     if(bPut == True):

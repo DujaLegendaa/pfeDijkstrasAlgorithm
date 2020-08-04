@@ -3,7 +3,9 @@ import algoritam as alg
 import pygame as pg
 import GUI
 
-(visina, sirina) = (600, 1000)
+visina = 600
+GUIdodatak = 400
+sirina = visina + GUIdodatak
 velicinaKvadrata = 20
 
 def main():
@@ -19,11 +21,11 @@ def main():
             if ev.type == pg.QUIT:
                 viz.running = False
             if ev.type == pg.MOUSEBUTTONUP and izvrsen == False and pozicijeObojenihKvadrata == False:
-                pozicijeObojenihKvadrata = GUI.obojKvadrat(kvadrati, ekran)
+                GUI.obojKvadrat(kvadrati, ekran)
             if ev.type==pg.KEYDOWN:
                 if ev.key==pg.K_RETURN:
                         if izvrsen == False:
-                            (put, predjeniNodeovi) = alg.main(pozicijeObojenihKvadrata, kvadrati)
+                            (put, predjeniNodeovi) = alg.switchAlgoritma(1, GUI.pozicijeObojenihKvadrata, kvadrati)
                             izvrsen = True
                         else:
                             viz.reset()
