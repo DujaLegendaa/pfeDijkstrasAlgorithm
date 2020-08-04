@@ -67,7 +67,8 @@ def dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
 
     return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
 
-def bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
+def bfs(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
+    brojKvadrata = math.floor(math.sqrt(len(pozicijeSvihKvadrata)))
     pregledaniNodeovi = []
 
     kju = queue.Queue(0)
@@ -100,7 +101,8 @@ def pregledajObliznjeNode(trenutniNode, nodeGrid2d, kraj, pregledaniNodeovi, kju
                 return -1
 
 
-def dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
+def dfs(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
+    brojKvadrata = math.floor(math.sqrt(len(pozicijeSvihKvadrata)))
     pregledaniNodeovi = []
 
     kju = queue.LifoQueue(0)
@@ -115,7 +117,8 @@ def dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
 
     return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
         
-def aStar(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
+def aStar(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
+    brojKvadrata = math.floor(math.sqrt(len(pozicijeSvihKvadrata)))
     pregledaniNodeovi = []
 
     otvoreneNodeQ = []
@@ -185,6 +188,7 @@ def nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata):
         put.append(pozicijeSvihKvadrata[trenutniNode.roditelj.x * brojKvadrata + trenutniNode.roditelj.y])
         trenutniNode = trenutniNode.roditelj
     put.pop()
+    put.reverse()
     return put
 
 def kreirajGridNoda(x):
