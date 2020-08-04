@@ -1,4 +1,3 @@
-import visualizer as viz
 import math
 import heapq
 import sys
@@ -30,24 +29,23 @@ X = [0,1,0,-1];
 Y = [-1,0,1,0];
 
 
-def main():
-    pozicijeUnetihKvadrata = viz.pozicijeObojenihKvadrata
-    pozicijeSvihKvadrata = viz.kvadrati
-    brojKvadrata = math.floor(math.sqrt(len(pozicijeSvihKvadrata)))
+def main(pozicijeObojenihKvadrata, kvadrati):
+    pozicijeUnetihKvadrata = pozicijeObojenihKvadrata
+    pozicijeSvihKvadrata = kvadrati
+    brojKvadrataUOsi = math.floor(math.sqrt(len(pozicijeSvihKvadrata)))
 
-    nodeGrid2d = kreirajGridNoda(brojKvadrata)
+    nodeGrid2d = kreirajGridNoda(brojKvadrataUOsi)
     velicina = len(nodeGrid2d)
 
-    (pocetak, kraj) = korisnickiUnetiKvadrati(nodeGrid2d, pozicijeSvihKvadrata, pozicijeUnetihKvadrata, brojKvadrata)
+    (pocetak, kraj) = korisnickiUnetiKvadrati(nodeGrid2d, pozicijeSvihKvadrata, pozicijeUnetihKvadrata, brojKvadrataUOsi)
     pocetak.distanca = 0
 
-    #return dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
-    #return bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
+    #return dijakstra(pocetak, kraj, nodeGrid2d, brojKvadrataUOsi, pozicijeSvihKvadrata)
+    return bfs(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
     #return dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
     #return aStar(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
 
-def dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
-    brojKvadrata = math.floor(math.sqrt(len(pozicijeSvihKvadrata)))
+def dijakstra(pocetak, kraj, nodeGrid2d, brojKvadrataUOsi, pozicijeSvihKvadrata):
     velicina = len(nodeGrid2d)
 
     pregledaniNodeovi = []
@@ -65,7 +63,7 @@ def dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
         if pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregledaniNodeovi, priorityQueue, False) == -1:
             break
 
-    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrataUOsi), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrataUOsi))
 
 def bfs(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
     brojKvadrata = math.floor(math.sqrt(len(pozicijeSvihKvadrata)))
@@ -175,17 +173,17 @@ def pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregleda
 
 
 
-def nodeToRect(nodeArr, pozicijeSvihKvadrata, brojKvadrata):
+def nodeToRect(nodeArr, pozicijeSvihKvadrata, brojKvadrataUOsi):
     rectArr = []
     for node in nodeArr:
-        rectArr.append(pozicijeSvihKvadrata[node.x * brojKvadrata + node.y])
+        rectArr.append(pozicijeSvihKvadrata[node.x * brojKvadrataUOsi + node.y])
     return rectArr
 
-def nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata):
+def nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrataUOsi):
     put = []
     trenutniNode = nodeGrid2d[kraj.x][kraj.y]
     while trenutniNode != pocetak and trenutniNode.roditelj != None:
-        put.append(pozicijeSvihKvadrata[trenutniNode.roditelj.x * brojKvadrata + trenutniNode.roditelj.y])
+        put.append(pozicijeSvihKvadrata[trenutniNode.roditelj.x * brojKvadrataUOsi + trenutniNode.roditelj.y])
         trenutniNode = trenutniNode.roditelj
     put.pop()
     put.reverse()

@@ -1,7 +1,6 @@
 import pygame as pg
 
 ### Korisnicke Promenjive ###
-(visina, sirina) = (600, 600)
 boje = { "bojaPKvadrata": (50, 168, 82),
          "bojaKKvadrata": (168, 64, 50),
          "bojaGrida": (0, 0, 0),
@@ -13,13 +12,6 @@ velicinaKvadrata = 20
 ##############################
 
 running = True
-kvadrati = []
-pozicijeObojenihKvadrata = []
-nacrtanPocetak = False
-nacrtanKraj = False
-pg.init()
-ekran = pg.display.set_mode((visina, sirina))
-ekran.fill(pg.Color("white"))
 
 def reset():
     global nacrtanPocetak, nacrtanKraj
@@ -59,7 +51,7 @@ def obojKvadrat():
             pozicijeObojenihKvadrata.append(kvadrat)
 
 
-def obojiPut(put, i, bPut):
+def obojiPut(put, i, bPut, ekran):
     if(bPut == True):
         boja = boje["radnaBoja"]
     else:
