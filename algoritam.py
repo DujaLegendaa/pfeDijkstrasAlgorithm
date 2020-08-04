@@ -12,27 +12,22 @@ class Node:
         self.h = 0
         self.f = 0
 
-    def __lt__(self, other):
-        return self.distanca < other.distanca
-
-    def __lt__(self, other):
-        return self.f < other.f
-
     distanca = sys.maxsize
     roditelj = None
     pregledan = False
     blokiran = False
+    GHF = False
     
+    def __lt__(self, other):
+        if self.GHF == False:
+            return self.distanca < other.distanca
+        else:
+            return self.f < other.f
 
 horizontalnaVertikalnaDistanca = 1.0
 diagonalnaDistanca = 1.4
-
-def jeValidna(i, j, brojKvadrata, pregledan):
-    return (not pregledan and i >= 0 and i < brojKvadrata and j>=0 and j < brojKvadrata)
-
 X = [0,1,0,-1];
 Y = [-1,0,1,0];
-
 
 
 def main():
@@ -49,16 +44,13 @@ def main():
     #return dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
     #return bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
     #return dfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
-    return aStar(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
-
-
-
+    #return aStar(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata)
 
 def dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
     brojKvadrata = math.floor(math.sqrt(len(pozicijeSvihKvadrata)))
     velicina = len(nodeGrid2d)
 
-    pregeledaniNodeovi = []
+    pregledaniNodeovi = []
 
     priorityQueue = []
     heapq.heapify(priorityQueue)
@@ -66,65 +58,14 @@ def dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
     heapq.heappush(priorityQueue, pocetak)
     trenutniNode = Node(-1, -1)
 
-    while (len(priorityQueue) > 0) and (trenutniNode != kraj):
+    while len(priorityQueue) > 0:
         trenutniNode = heapq.heappop(priorityQueue)
         tempNode = None
 
-        #gore
-        if trenutniNode.y - 1 >= 0:
+        if pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregledaniNodeovi, priorityQueue, False) == -1:
+            break
 
-            #gore gore
-            tempNode = nodeGrid2d[trenutniNode.x][trenutniNode.y - 1]
-            nodeLogic(tempNode, trenutniNode, horizontalnaVertikalnaDistanca, priorityQueue)
-
-            
-            #gore desno
-            if trenutniNode.x + 1 < velicina:
-                tempNode = nodeGrid2d[trenutniNode.x + 1][trenutniNode.y - 1]
-                nodeLogic(tempNode, trenutniNode, diagonalnaDistanca, priorityQueue)
-
-            #gore levo
-            if trenutniNode.x - 1 >= 0:
-                tempNode = nodeGrid2d[trenutniNode.x - 1][trenutniNode.y - 1]
-                nodeLogic(tempNode, trenutniNode, diagonalnaDistanca, priorityQueue)
-            
-        #desno
-        if trenutniNode.x + 1 < velicina:
-            tempNode = nodeGrid2d[trenutniNode.x + 1][trenutniNode.y]
-            nodeLogic(tempNode, trenutniNode, horizontalnaVertikalnaDistanca, priorityQueue)
-
-        #dole
-        if trenutniNode.y + 1 < velicina:
-
-            #dole dole
-            tempNode = nodeGrid2d[trenutniNode.x][trenutniNode.y + 1]
-            nodeLogic(tempNode, trenutniNode, horizontalnaVertikalnaDistanca, priorityQueue)
-            
-            #dole desno
-            if trenutniNode.x + 1 < velicina:
-                tempNode = nodeGrid2d[trenutniNode.x + 1][trenutniNode.y + 1]
-                nodeLogic(tempNode, trenutniNode, diagonalnaDistanca, priorityQueue)
-
-            #dole levo
-            if trenutniNode.x - 1 >= 0:
-                tempNode = nodeGrid2d[trenutniNode.x - 1][trenutniNode.y + 1]
-                nodeLogic(tempNode, trenutniNode, diagonalnaDistanca, priorityQueue)
-            
-        #levo
-        if trenutniNode.x - 1 >= 0:
-            tempNode = nodeGrid2d[trenutniNode.x - 1][trenutniNode.y]
-            nodeLogic(tempNode, trenutniNode, horizontalnaVertikalnaDistanca, priorityQueue)
-
-        trenutniNode.pregledan = True
-        pregeledaniNodeovi.append(trenutniNode)
-
-    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregeledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
-
-def nodeLogic(tempNode, trenutniNode, distanca, priorityQueue):
-    if tempNode.pregledan == False and (tempNode.blokiran == False ) and (tempNode.distanca > trenutniNode.distanca + distanca):
-                    tempNode.distanca = trenutniNode.distanca + distanca
-                    tempNode.roditelj = trenutniNode
-                    heapq.heappush(priorityQueue, tempNode)
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
 
 def bfs(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
     pregledaniNodeovi = []
@@ -184,9 +125,7 @@ def aStar(pocetak, kraj, nodeGrid2d, brojKvadrata, pozicijeSvihKvadrata):
     while len(otvoreneNodeQ) > 0:
         trenutniNode = heapq.heappop(otvoreneNodeQ)
 
-        print(trenutniNode)
-
-        if pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregledaniNodeovi, otvoreneNodeQ) == -1:
+        if pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregledaniNodeovi, otvoreneNodeQ, True) == -1:
             break
 
     return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
@@ -197,7 +136,7 @@ def trebaDodati(tempNode, otvoreneNodeQ):
             return False
     return True
 
-def pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregledaniNodeovi, kju):
+def pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregledaniNodeovi, kju, GHF):
     tempNode = None
 
     for k in range(0, 4):
@@ -207,16 +146,25 @@ def pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregleda
         if(dx >= 0 and dx < len(nodeGrid2d) and dy >= 0 and dy < len(nodeGrid2d)):
             tempNode = nodeGrid2d[dx][dy]
             if tempNode.pregledan == False and tempNode.blokiran == False:
-                tempNode.pregledan = True
-                tempNode.roditelj = trenutniNode
-                pregledaniNodeovi.append(tempNode)
+                if GHF == False:
+                    if tempNode.distanca > trenutniNode.distanca + horizontalnaVertikalnaDistanca:
+                        tempNode.distanca = trenutniNode.distanca + horizontalnaVertikalnaDistanca
+                        tempNode.pregledan = True
+                        tempNode.roditelj = trenutniNode
+                        pregledaniNodeovi.append(tempNode)
+                        heapq.heappush(kju, tempNode)
 
-                tempNode.g = abs(tempNode.x - pocetak.x) + abs(tempNode.y - pocetak.y)
-                tempNode.h = abs(tempNode.x - kraj.x) + abs(tempNode.y - kraj.y)
-                tempNode.f = tempNode.g + tempNode.h
+                if GHF == True:
+                    tempNode.GHF = True
+                    tempNode.pregledan = True
+                    tempNode.roditelj = trenutniNode
+                    pregledaniNodeovi.append(tempNode)
+                    tempNode.g = abs(tempNode.x - pocetak.x) + abs(tempNode.y - pocetak.y)
+                    tempNode.h = abs(tempNode.x - kraj.x) + abs(tempNode.y - kraj.y)
+                    tempNode.f = tempNode.g + tempNode.h
 
-                if trebaDodati(tempNode, kju):
-                    heapq.heappush(kju, tempNode)
+                    if trebaDodati(tempNode, kju):
+                        heapq.heappush(kju, tempNode)
 
             if tempNode is kraj:
                 return -1
