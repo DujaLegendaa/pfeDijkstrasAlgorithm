@@ -13,7 +13,7 @@ def main():
     i = 2
     k = 0
     (put, predjeniNodeovi) = (None, None)
-    (ekran, kvadrati) = GUI.main(sirina, visina, velicinaKvadrata)
+    (ekran, kvadrati) = GUI.main(sirina, visina, GUIdodatak, velicinaKvadrata)
     pozicijeObojenihKvadrata = False
     izvrsen = False
     while viz.running == True:

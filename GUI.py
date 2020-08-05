@@ -8,17 +8,39 @@ boje = { "bojaPKvadrata": (50, 168, 82),
          "radnaBoja": (66, 147, 245),
          "bojaTrenutna": (245, 47, 50)}
 
+dugmiciZaGui = [{"fontVelicina": 40, "text": "dijkstra", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
+                {"fontVelicina": 40, "text": "BFS", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
+                {"fontVelicina": 40, "text": "DFS", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
+                {"fontVelicina": 40, "text": "A*", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
+
+                {"fontVelicina": 52, "text": "Start", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": True},
+                {"fontVelicina": 52, "text": "Reset", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": True}
+]
+
 nacrtanPocetak = False
 nacrtanKraj = False
 pozicijeObojenihKvadrata = []
+ostaloVisine = 0
+ostaloSirine = 0
 
-def main(sirina, visina, velicinaKvadrata):
+def main(sirina, visina, GUIdodatak, velicinaKvadrata):
+    global ostaloVisine, ostaloSirine
+    ostaloVisine = visina
+    ostaloSirine = sirina
     brojKvadrataUOsi = visina // velicinaKvadrata
     pg.init()
     ekran = pg.display.set_mode((sirina, visina))
     ekran.fill(pg.Color("white"))
 
     kvadrati = nacrtajGrid(ekran, brojKvadrataUOsi, velicinaKvadrata)
+
+    dugmiciZaCrtanjeArr = dobijDugmiceZaCrtanje(GUIdodatak, visina, dugmiciZaGui, "Roboto-Regular.ttf", 20, 20)
+
+    for dugme in dugmiciZaCrtanjeArr:
+        internalRect = dugme[0].get_rect()
+        internalRect.center = (dugme[1].centerx, dugme[1].centery)
+        pg.draw.rect(ekran, (67, 183, 250), dugme[1])
+        ekran.blit(dugme[0], internalRect)
 
     return (ekran, kvadrati)
 
@@ -49,5 +71,62 @@ def obojKvadrat(kvadrati, ekran):
                 bojaKvadrata = boje["bojaPrepreke"]
             pg.draw.rect(ekran, bojaKvadrata, kvadrat, 0)
             pozicijeObojenihKvadrata.append(kvadrat)
+
+def dobijDugmiceZaCrtanje(GUIdodatak, visina, dugmiciList, fontIme, topPadding, leftPadding):
+    dugmiciRectArr = []
+    textRect = pg.Rect((0, 0, 0, 0))
+    for i in range (0, len(dugmiciList)):
+        temp = dugmiciList[i]
+        textSurface = dobijDugme(fontIme, temp["fontVelicina"], temp["text"], temp["boja"], temp["backgroundBoja"])
+        mestoDugmeta = odrediMestoDugmeta(GUIdodatak, visina, topPadding, leftPadding, temp["veliki"])
+        textRect.width = mestoDugmeta[1][0]
+        textRect.height = mestoDugmeta[1][1]
+        textRect.topleft = mestoDugmeta[0]
+        dugmiciRectArr.append((textSurface, textRect.copy()))
+
+    return dugmiciRectArr
+
+def odrediMestoDugmeta(GUIdodatak, visina, topPadding, leftPadding, veliki, visinaVelikog = 100, visinaMalog = 75):
+    global ostaloSirine, ostaloVisine
+    ###
+    sirinaMalog = GUIdodatak // 2 - leftPadding * 2
+    ###
+
+    (x, y) = (None, None)
+    (sirina, visinaInternal) = (None, None)
+
+    if veliki == True:
+        #if visina < ostaloVisine + visinaVelikog:
+            #raise NameError("nema mesta u visina za crtanje velikog dugmeta")
+
+        (sirina, visinaInternal) = (GUIdodatak - leftPadding * 2, visinaVelikog)
+        (x, y) = (visina + leftPadding, visina - ostaloVisine + topPadding)
+
+        ostaloVisine -= (visinaVelikog + topPadding)
+        #ostaloSirine -= (GUIdodatak - leftPadding * 2)
+        ostaloSirine = GUIdodatak
+    else:
+        #if visina < ostaloVisine + visinaMalog:
+            #raise NameError("nema mesta u visina za crtanje malog dugmeta")
+
+        (sirina, visinaInternal) = (GUIdodatak // 2 - leftPadding * 2, visinaMalog)
+        (x, y) = (visina + leftPadding if ostaloSirine != (GUIdodatak // 2) else visina + ostaloSirine + leftPadding, visina - ostaloVisine + topPadding)
+        
+
+        ###
+        #ostaloSirine -= GUIdodatak // 2
+        ostaloSirine = GUIdodatak if ostaloSirine == (GUIdodatak // 2) else (GUIdodatak // 2)
+        ostaloVisine = (ostaloVisine - (visinaMalog + topPadding)) if ostaloSirine == GUIdodatak else ostaloVisine
+        ###
+
+    #print(ostaloSirine)
+    return ((x, y),(sirina, visinaInternal))
+
+def dobijDugme(fontIme, fontVelicina, text, boja, backgroundBoja):
+    font = pg.font.Font(fontIme, fontVelicina)
+
+    textSurface = font.render(text, True, boja)
+
+    return textSurface
 
 
