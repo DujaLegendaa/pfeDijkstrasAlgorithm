@@ -3,69 +3,66 @@ import algoritam as alg
 import pygame as pg
 import GUI
 
-visina = 600
-GUIdodatak = 400
-sirina = visina + GUIdodatak
-velicinaKvadrata = 20
-
-def handleButtonPress(pozicijeiTextDugmica):
+def handleButtonPress(ekran, pozicijeiIDDugmica, obojiAktivnoDugmeFunc):
     brojAlgoritma = -1
     brojOpcije = -1
     def handleButtonPressInternal():
         nonlocal brojAlgoritma, brojOpcije
         posMisa = pg.mouse.get_pos()
-        for pozicijaiText in pozicijeiTextDugmica:
-            if pozicijaiText["pozicija"].collidepoint(posMisa):
-                if pozicijaiText["text"] == "BFS":
-                    brojAlgoritma = 0
-                if pozicijaiText["text"] == "DFS":
-                    brojAlgoritma = 1
-                if pozicijaiText["text"] == "Dijkstra":
-                    brojAlgoritma = 2
-                if pozicijaiText["text"] == "A*":
-                    brojAlgoritma = 3
-                if pozicijaiText["text"] == "Start":
-                    brojOpcije = 100
-                if pozicijaiText["text"] == "Resset":
-                    brojOpcije = 101
+        for pozicijaiID in pozicijeiIDDugmica:
+            if pozicijaiID["pozicija"].collidepoint(posMisa):
+                if pozicijaiID["id"] < 100:
+                    brojAlgoritma = pozicijaiID["id"]
+                elif pozicijaiID["id"] >= 100:
+                    brojOpcije = pozicijaiID["id"]
+                else:
+                    raise NameError("pogresan id dugmeta")
+                obojiAktivnoDugmeFunc(pozicijaiID["id"], pozicijaiID["pozicija"])
         return (brojAlgoritma, brojOpcije)
     return handleButtonPressInternal
+
 def main():
     FPS = 30;
-    i = 2
-    k = 0
-    (put, predjeniNodeovi) = (None, None)
+
+    visina = 600
+    GUIdodatak = 400
+    sirina = visina + GUIdodatak
+    velicinaKvadrata = 20
+
+    nacrtanPut = False
+    nacrtanNajkraciPut = False
+
+    (najkraciPut, predjeniNodeovi) = (None, None)
     (brojAlgoritma, brojOpcije) = (-1, -1)
-    (ekran, kvadrati, pozicijeiTextDugmica) = GUI.main(sirina, visina, GUIdodatak, velicinaKvadrata)
+    (ekran, kvadrati, pozicijeiIDDugmica) = GUI.main(sirina, visina, GUIdodatak, velicinaKvadrata)
+
     obojKvadratFunc = GUI.obojKvadrat(kvadrati, ekran)
-    handleButtonPressFunc = handleButtonPress(pozicijeiTextDugmica)
-    izvrsen = False
-    while viz.running == True:
+    obojAktivnoDugmeFunc = GUI.obojiAktivnoDugme(ekran)
+    handleButtonPressFunc = handleButtonPress(ekran, pozicijeiIDDugmica, obojAktivnoDugmeFunc)
+    obojPutRadaFunc = viz.obojiPut(True, ekran)
+    obojNajkraciPut = viz.obojiPut(False, ekran)
+
+    running = True
+
+    while running == True:
         for ev in pg.event.get():
             if ev.type == pg.QUIT:
-                viz.running = False
-            if ev.type == pg.MOUSEBUTTONUP and izvrsen == False:
+                running = False
+            if ev.type == pg.MOUSEBUTTONUP:
                 pozicijeObojenihKvadrata = obojKvadratFunc()
                 (brojAlgoritma, brojOpcije) = handleButtonPressFunc()
-            if ev.type==pg.KEYDOWN:
-                if ev.key==pg.K_RETURN:
-                        if izvrsen == False:
-                            (put, predjeniNodeovi) = alg.switchAlgoritma(brojAlgoritma, pozicijeObojenihKvadrata, kvadrati)
-                            izvrsen = True
-                        else:
-                            viz.reset()
-                            i = 2
-                            k = 1
-                            (put, predjeniNodeovi) = (None, None)
-                            izvrsen = False
-            
+
         if brojAlgoritma != -1 and brojOpcije == 100:
-            (put, predjeniNodeovi) = alg.switchAlgoritma(brojAlgoritma, pozicijeObojenihKvadrata, kvadrati)
+            (najkraciPut, predjeniNodeovi) = alg.switchAlgoritma(brojAlgoritma, pozicijeObojenihKvadrata, kvadrati)
             brojOpcije = -1
-        if((predjeniNodeovi != None) and (i == 1 or i != -1)):
-            i = viz.obojiPut(predjeniNodeovi, i, True, ekran)
-        if(i == -1 and put != None and (k == 0 or k!= -1)):
-            k = viz.obojiPut(put, k, False, ekran)
+        if brojOpcije == 101:
+            return main()
+
+        if predjeniNodeovi != None and nacrtanPut == False and nacrtanNajkraciPut == False:
+            nacrtanPut = obojPutRadaFunc(predjeniNodeovi)
+        if najkraciPut != None and nacrtanPut == True and nacrtanNajkraciPut == False:
+            nacrtanNajkraciPut = obojNajkraciPut(najkraciPut)
+
         pg.time.Clock().tick(FPS)
         pg.display.update()
 

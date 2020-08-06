@@ -37,6 +37,8 @@ def switchAlgoritma(index, pozicijeObojenihKvadrata, kvadrati):
     velicina = len(nodeGrid2d)
 
     (pocetak, kraj) = korisnickiUnetiKvadrati(nodeGrid2d, pozicijeSvihKvadrata, pozicijeUnetihKvadrata, brojKvadrataUOsi)
+    if pocetak == None or kraj == None:
+        return (None, None)
     pocetak.distanca = 0
 
     if index == 0:
@@ -48,10 +50,11 @@ def switchAlgoritma(index, pozicijeObojenihKvadrata, kvadrati):
     elif index == 3:
         return aStar(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata)
     else:
-        print("bad algorithm index")
+        raise NameError("bad algoritam index")
         return -1
 
-def dijakstra(pocetak, kraj, nodeGrid2d, brojKvadrataUOsi, pozicijeSvihKvadrata):
+def dijakstra(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
+    brojKvadrata = math.floor(math.sqrt(len(pozicijeSvihKvadrata)))
     velicina = len(nodeGrid2d)
 
     pregledaniNodeovi = []
@@ -69,7 +72,7 @@ def dijakstra(pocetak, kraj, nodeGrid2d, brojKvadrataUOsi, pozicijeSvihKvadrata)
         if pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregledaniNodeovi, priorityQueue, False) == -1:
             break
 
-    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrataUOsi), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrataUOsi))
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, pozicijeSvihKvadrata, brojKvadrata), nodeToRect(pregledaniNodeovi, pozicijeSvihKvadrata, brojKvadrata))
 
 def bfs(pocetak, kraj, nodeGrid2d, pozicijeSvihKvadrata):
     brojKvadrata = math.floor(math.sqrt(len(pozicijeSvihKvadrata)))

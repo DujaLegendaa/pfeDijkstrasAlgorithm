@@ -11,31 +11,24 @@ boje = { "bojaPKvadrata": (50, 168, 82),
 velicinaKvadrata = 20
 ##############################
 
-running = True
-
-def reset():
-    global nacrtanPocetak, nacrtanKraj
-    ekran.fill(pg.Color("white"))
-    kvadrati.clear()
-    pozicijeObojenihKvadrata.clear()
-    nacrtanPocetak = False
-    nacrtanKraj = False
-    nacrtajGrid()
-
-
-def obojiPut(put, i, bPut, ekran):
-    if(bPut == True):
-        boja = boje["radnaBoja"]
-    else:
-        boja = boje["bojaPuta"]
-    if(i < len(put)):
-        pg.draw.rect(ekran, boja, put[i - 1], 0)
-        pg.draw.rect(ekran, boje["bojaGrida"], put[i - 1], 1)
-        pg.draw.rect(ekran, boje["bojaTrenutna"], put[i], 0)
-        return i + 1
-    else:
-        if(bPut == False):
-            pg.draw.rect(ekran, boja, put[i-1],0)
-            pg.draw.rect(ekran, boje["bojaGrida"], put[i - 1], 1)
-        return -1
+def obojiPut(bPut, ekran):
+    i = 0
+    def obojiPutInternal(put):
+        nonlocal i
+        if(bPut == True):
+            if i == len(put) - 1:
+                return True
+            boja = boje["radnaBoja"]
+            pg.draw.rect(ekran, boja, put[i], 0)
+            pg.draw.rect(ekran, boje["bojaGrida"], put[i], 1)
+            pg.draw.rect(ekran, boje["bojaTrenutna"], put[i + 1], 0)
+        else:
+            if i == len(put):
+                return True
+            boja = boje["bojaPuta"]
+            pg.draw.rect(ekran, boja, put[i],0)
+            pg.draw.rect(ekran, boje["bojaGrida"], put[i], 1)
+        i += 1
+        return False
+    return obojiPutInternal
 

@@ -8,13 +8,13 @@ boje = { "bojaPKvadrata": (50, 168, 82),
          "radnaBoja": (66, 147, 245),
          "bojaTrenutna": (245, 47, 50)}
 
-dugmiciZaGui = [{"fontVelicina": 40, "text": "BFS", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
-                {"fontVelicina": 40, "text": "DFS", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
-                {"fontVelicina": 40, "text": "Dijkstra", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
-                {"fontVelicina": 40, "text": "A*", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
+dugmiciZaGui = [{"id": 0, "fontVelicina": 40, "text": "BFS", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
+                {"id": 1, "fontVelicina": 40, "text": "DFS", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
+                {"id": 2, "fontVelicina": 40, "text": "Dijkstra", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
+                {"id": 3, "fontVelicina": 40, "text": "A*", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
 
-                {"fontVelicina": 52, "text": "Start", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": True},
-                {"fontVelicina": 52, "text": "Reset", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": True}
+                {"id": 100, "fontVelicina": 52, "text": "Start", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": True},
+                {"id": 101, "fontVelicina": 52, "text": "Reset", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": True}
 ]
 
 pozicijeObojenihKvadrata = []
@@ -33,7 +33,7 @@ def main(sirina, visina, GUIdodatak, velicinaKvadrata):
 
     pozicijeDugmica = []
     for i in range(len(dugmiciZaCrtanjeArr)):
-        pozicijeDugmica.append({"pozicija": dugmiciZaCrtanjeArr[i][1].copy(), "text": dugmiciZaGui[i]["text"]})
+        pozicijeDugmica.append({"pozicija": dugmiciZaCrtanjeArr[i][1].copy(), "id": dugmiciZaGui[i]["id"]})
 
     return (ekran, kvadrati, pozicijeDugmica)
 
@@ -42,6 +42,7 @@ def nacrtajDugmice(ekran, dugmiciZaCrtanjeArr):
         internalRect = dugme[0].get_rect()
         internalRect.center = (dugme[1].centerx, dugme[1].centery)
         pg.draw.rect(ekran, (67, 183, 250), dugme[1])
+        pg.draw.rect(ekran, (0,0,0), dugme[1], 1)
         ekran.blit(dugme[0], internalRect)
 
 def nacrtajGrid(ekran, brojKvadrataUOsi, velicinaKvadrata):
@@ -137,5 +138,41 @@ def dobijDugme(fontIme, fontVelicina, text, boja, backgroundBoja):
     textSurface = font.render(text, True, boja)
 
     return textSurface
+
+def obojiAktivnoDugme(ekran):
+    indexObojenogDumeta = -1
+    oldDugme = None
+    oldPozicija = None
+    def obojiAktivnoDugmeInternal(dugmeID, dugmePozicija):
+        nonlocal indexObojenogDumeta, oldDugme, oldPozicija
+        def find(lst, key, value):
+            for i, dic in enumerate(lst):
+                if dic[key] == value:
+                    return i
+            return -1
+
+        if oldDugme != None:
+            textSurface = dobijDugme("Roboto-Regular.ttf", oldDugme["fontVelicina"], oldDugme["text"], oldDugme["boja"], oldDugme["backgroundBoja"])
+            internalRect = textSurface.get_rect()
+            internalRect.center = (oldPozicija.centerx, oldPozicija.centery)
+            pg.draw.rect(ekran, (67, 183, 250), oldPozicija)
+            pg.draw.rect(ekran, (0,0,0), oldPozicija, 1)
+            ekran.blit(textSurface, internalRect)
+        
+        indexObojenogDumeta = find(dugmiciZaGui, "id", dugmeID)
+        dugme = dugmiciZaGui[indexObojenogDumeta]
+
+        textSurface = dobijDugme("Roboto-Regular.ttf", dugme["fontVelicina"], dugme["text"], dugme["boja"], dugme["backgroundBoja"])
+        internalRect = textSurface.get_rect()
+        internalRect.center = (dugmePozicija.centerx, dugmePozicija.centery)
+        pg.draw.rect(ekran, (242, 75, 41), dugmePozicija)
+        pg.draw.rect(ekran, (0,0,0), dugmePozicija, 1)
+        ekran.blit(textSurface, internalRect)
+
+        oldDugme = dugme
+        oldPozicija = dugmePozicija
+
+    return obojiAktivnoDugmeInternal
+
 
 
