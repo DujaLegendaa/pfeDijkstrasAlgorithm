@@ -13,19 +13,20 @@ def main():
     i = 2
     k = 0
     (put, predjeniNodeovi) = (None, None)
-    (ekran, kvadrati) = GUI.main(sirina, visina, GUIdodatak, velicinaKvadrata)
-    pozicijeObojenihKvadrata = False
+    (ekran, kvadrati, pozicijeiTextDugmica) = GUI.main(sirina, visina, GUIdodatak, velicinaKvadrata)
+    obojKvadratFunc = GUI.obojKvadrat(kvadrati, ekran)
     izvrsen = False
     while viz.running == True:
         for ev in pg.event.get():
             if ev.type == pg.QUIT:
                 viz.running = False
-            if ev.type == pg.MOUSEBUTTONUP and izvrsen == False and pozicijeObojenihKvadrata == False:
-                GUI.obojKvadrat(kvadrati, ekran)
+            if ev.type == pg.MOUSEBUTTONUP and izvrsen == False:
+                pozicijeObojenihKvadrata = obojKvadratFunc()
+                #handleButtonPress(pozicijeiTextDugmica)
             if ev.type==pg.KEYDOWN:
                 if ev.key==pg.K_RETURN:
                         if izvrsen == False:
-                            (put, predjeniNodeovi) = alg.switchAlgoritma(1, GUI.pozicijeObojenihKvadrata, kvadrati)
+                            (put, predjeniNodeovi) = alg.switchAlgoritma(1, pozicijeObojenihKvadrata, kvadrati)
                             izvrsen = True
                         else:
                             viz.reset()
@@ -43,3 +44,16 @@ def main():
 
 main()
     
+def handleButtonPress(pozicijeiTextDugmica):
+    posMisa = pg.mouse.get_pos()
+
+    for pozicijaiText in pozicijeiTextDugmica:
+        if pozicija["pozicija"].collidepoint(posMisa):
+            if pozicijaiText["text"] == "dijkstra":
+                return alg.dijakstra
+            if pozicijaiText["text"] == "BFS":
+                return alg.bfs
+            if pozicijaiText["text"] == "DFS":
+                return alg.dfs
+            if pozicijaiText["text"] == "A*":
+                return alg.aStar
