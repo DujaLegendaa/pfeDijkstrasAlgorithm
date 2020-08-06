@@ -8,9 +8,9 @@ boje = { "bojaPKvadrata": (50, 168, 82),
          "radnaBoja": (66, 147, 245),
          "bojaTrenutna": (245, 47, 50)}
 
-dugmiciZaGui = [{"fontVelicina": 40, "text": "dijkstra", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
-                {"fontVelicina": 40, "text": "BFS", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
+dugmiciZaGui = [{"fontVelicina": 40, "text": "BFS", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
                 {"fontVelicina": 40, "text": "DFS", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
+                {"fontVelicina": 40, "text": "Dijkstra", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
                 {"fontVelicina": 40, "text": "A*", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
 
                 {"fontVelicina": 52, "text": "Start", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": True},
@@ -33,7 +33,7 @@ def main(sirina, visina, GUIdodatak, velicinaKvadrata):
 
     pozicijeDugmica = []
     for i in range(len(dugmiciZaCrtanjeArr)):
-        pozicijeDugmica.append({"pozicija": dugmiciZaCrtanjeArr[i][1].copy, "text": dugmiciZaGui[i]["text"]})
+        pozicijeDugmica.append({"pozicija": dugmiciZaCrtanjeArr[i][1].copy(), "text": dugmiciZaGui[i]["text"]})
 
     return (ekran, kvadrati, pozicijeDugmica)
 
