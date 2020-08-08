@@ -22,7 +22,7 @@ def handleButtonPress(ekran, pozicijeiIDDugmica, obojiAktivnoDugmeFunc):
     return handleButtonPressInternal
 
 def main():
-    FPS = 30;
+    FPS = 100;
 
     visina = 600
     GUIdodatak = 400

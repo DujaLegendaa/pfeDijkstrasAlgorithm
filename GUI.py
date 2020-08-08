@@ -17,8 +17,6 @@ dugmiciZaGui = [{"id": 0, "fontVelicina": 40, "text": "BFS", "boja": (0, 0, 0), 
                 {"id": 101, "fontVelicina": 52, "text": "Reset", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": True}
 ]
 
-pozicijeObojenihKvadrata = []
-
 def main(sirina, visina, GUIdodatak, velicinaKvadrata):
     brojKvadrataUOsi = visina // velicinaKvadrata
     pg.init()
