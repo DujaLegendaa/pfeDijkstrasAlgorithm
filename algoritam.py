@@ -10,16 +10,20 @@ class Node:
         self.g = 0
         self.h = 0
         self.f = 0
+        self.distanca = 1.0
+        self.diagonalnaDistanca = math.sqrt(self.distanca * self.distanca + self.distanca * self.distanca)
 
     roditelj = None
     pregledan = False
     blokiran = False
+
+    def setDistanca(self, novaDistanca):
+        self.distanca = novaDistanca
+        self.diagonalnaDistanca = math.sqrt(novaDistanca * novaDistanca + novaDistanca * novaDistanca)
     
     def __lt__(self, other):
         return self.f < other.f
 
-horizontalnaVertikalnaDistanca = 1.0
-diagonalnaDistanca = 1.4
 X = [ 0, 1, 1, 1, 0, -1, -1, -1];
 Y = [ 1, 1, 0, -1, -1, -1, 0, 1];
 #X = [0, 1, 0, -1]
@@ -44,7 +48,9 @@ def switchAlgoritma(index, pozicijeUnetihKvadrata, kvadrati):
     nodeGrid2d = kreirajGridNoda(brojKvadrataUOsi)
     velicina = len(nodeGrid2d)
 
-    (pocetak, kraj) = korisnickiUnetiKvadrati(nodeGrid2d, kvadrati, pozicijeUnetihKvadrata, brojKvadrataUOsi)
+    pronalazacFunc = nadjiKvadratUGridu(nodeGrid2d)
+    (pocetak, kraj) = resiPozicijeUnetihKvadrata(pozicijeUnetihKvadrata, pronalazacFunc)
+
     if pocetak == None or kraj == None:
         return (None, None)
 
@@ -60,7 +66,32 @@ def switchAlgoritma(index, pozicijeUnetihKvadrata, kvadrati):
         raise NameError("bad algoritam index")
         return -1
 
+def resiPozicijeUnetihKvadrata(pozicijeUnetihKvadrata, pronalazacFunc):
+    pocetak = pronalazacFunc(pozicijeUnetihKvadrata["pocetak"])
+    kraj = pronalazacFunc(pozicijeUnetihKvadrata["kraj"])
+    for blokiranKvadrat in pozicijeUnetihKvadrata["blokirane"]:
+        pronalazacFunc(blokiranKvadrat).blokiran = True
 
+    for vodaKvadrat in pozicijeUnetihKvadrata["voda"]:
+        pronalazacFunc(vodaKvadrat).setDistanca(2)
+    for planinaKvadrat in pozicijeUnetihKvadrata["planine"]:
+        pronalazacFunc(planinaKvadrat).setDistanca(4)
+    for brdoKvadrat in pozicijeUnetihKvadrata["brda"]:
+        pronalazacFunc(brdoKvadrat).setDistanca(3)
+    for ledKvadrat in pozicijeUnetihKvadrata["led"]:
+        pronalazacFunc(ledKvadrat).setDistanca(0.3)
+
+
+    return (pocetak, kraj)
+
+def nadjiKvadratUGridu(nodeGrid2d):
+
+    def internal(kvadrat):
+        x = kvadrat.x // kvadrat.width
+        y = kvadrat.y // kvadrat.width
+
+        return nodeGrid2d[x][y]
+    return internal
 
 def pregledajObliznjeNode(trenutniNode, nodeGrid2d, kraj, pregledaniNodeovi, kju):
     tempNode = None
@@ -89,7 +120,7 @@ def pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregleda
         if(dx >= 0 and dx < len(nodeGrid2d) and dy >= 0 and dy < len(nodeGrid2d)):
             tempNode = nodeGrid2d[dx][dy]
             if tempNode.pregledan == False and tempNode.blokiran == False:
-                distanca = diagonalnaDistanca if X[k] != 0 and Y[k] != 0 else horizontalnaVertikalnaDistanca
+                distanca = tempNode.diagonalnaDistanca if X[k] != 0 and Y[k] != 0 else tempNode.distanca
 
                 if dijkstra == True: 
                     tempNode.h = 0 
@@ -136,25 +167,6 @@ def kreirajGridNoda(x):
 
     return nodeGrid2d
 
-def korisnickiUnetiKvadrati(nodeGrid2d, kvadrati, pozicijeUnetihKvadrata, brojKvadrata):
-    both = []
-    (pocetak, kraj) = (None, None)
-    for i in range(len(pozicijeUnetihKvadrata)):
-        for j in range(len(kvadrati)):
-            if pozicijeUnetihKvadrata[i] == kvadrati[j]:
-                both.append((j, i))
-    
-    for i in both:
-        if both[0] == i:
-            pocetak = nodeGrid2d[i[0] // brojKvadrata][i[0] % brojKvadrata]
-            pocetak.pregledan = True
-        elif both[1] == i:
-            kraj = nodeGrid2d[i[0] // brojKvadrata][i[0] % brojKvadrata]
-        else:
-            nodeGrid2d[i[0] // brojKvadrata][i[0] % brojKvadrata].blokiran = True
-    
-    return (pocetak, kraj)
-
 def bfs(pocetak, kraj, nodeGrid2d, kvadrati):
     brojKvadrata = math.floor(math.sqrt(len(kvadrati)))
     pregledaniNodeovi = []
@@ -169,7 +181,7 @@ def bfs(pocetak, kraj, nodeGrid2d, kvadrati):
         if pregledajObliznjeNode(trenutniNode, nodeGrid2d, kraj, pregledaniNodeovi, kju) == -1:
             break
 
-    return (nadjiPut(nodeGrid2d, pocetak, kraj, kvadrati, brojKvadrata), nodeToRect(pregledaniNodeovi, kvadrati, brojKvadrata))
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, kvadrati, brojKvadrata), nodeToRect(pregledaniNodeovi, kvadrati, brojKvadrata), nodeGrid2d)
 
 def dfs(pocetak, kraj, nodeGrid2d, kvadrati):
     brojKvadrata = math.floor(math.sqrt(len(kvadrati)))
@@ -185,7 +197,7 @@ def dfs(pocetak, kraj, nodeGrid2d, kvadrati):
         if pregledajObliznjeNode(trenutniNode, nodeGrid2d, kraj, pregledaniNodeovi, kju) == -1:
             break
 
-    return (nadjiPut(nodeGrid2d, pocetak, kraj, kvadrati, brojKvadrata), nodeToRect(pregledaniNodeovi, kvadrati, brojKvadrata))
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, kvadrati, brojKvadrata), nodeToRect(pregledaniNodeovi, kvadrati, brojKvadrata), nodeGrid2d)
 
 def dijakstra(pocetak, kraj, nodeGrid2d, kvadrati):
     brojKvadrata = math.floor(math.sqrt(len(kvadrati)))
@@ -206,7 +218,7 @@ def dijakstra(pocetak, kraj, nodeGrid2d, kvadrati):
         if pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregledaniNodeovi, priorityQueue, True) == -1:
             break
 
-    return (nadjiPut(nodeGrid2d, pocetak, kraj, kvadrati, brojKvadrata), nodeToRect(pregledaniNodeovi, kvadrati, brojKvadrata))
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, kvadrati, brojKvadrata), nodeToRect(pregledaniNodeovi, kvadrati, brojKvadrata), nodeGrid2d)
 
 def aStar(pocetak, kraj, nodeGrid2d, kvadrati):
     brojKvadrata = math.floor(math.sqrt(len(kvadrati)))
@@ -222,4 +234,4 @@ def aStar(pocetak, kraj, nodeGrid2d, kvadrati):
         if pregledajObliznjeNodeHeapQ(trenutniNode, nodeGrid2d, pocetak, kraj, pregledaniNodeovi, otvoreneNodeQ, False) == -1:
             break
 
-    return (nadjiPut(nodeGrid2d, pocetak, kraj, kvadrati, brojKvadrata), nodeToRect(pregledaniNodeovi, kvadrati, brojKvadrata))
+    return (nadjiPut(nodeGrid2d, pocetak, kraj, kvadrati, brojKvadrata), nodeToRect(pregledaniNodeovi, kvadrati, brojKvadrata), nodeGrid2d)

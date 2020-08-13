@@ -6,19 +6,22 @@ import GUI
 def handleButtonPress(ekran, pozicijeiIDDugmica, obojiAktivnoDugmeFunc):
     brojAlgoritma = -1
     brojOpcije = -1
+    brojCetkice = -1
     def handleButtonPressInternal():
-        nonlocal brojAlgoritma, brojOpcije
+        nonlocal brojAlgoritma, brojOpcije, brojCetkice
         posMisa = pg.mouse.get_pos()
         for pozicijaiID in pozicijeiIDDugmica:
             if pozicijaiID["pozicija"].collidepoint(posMisa):
                 if pozicijaiID["id"] < 100:
                     brojAlgoritma = pozicijaiID["id"]
-                elif pozicijaiID["id"] >= 100:
+                elif pozicijaiID["id"] >= 100 and pozicijaiID["id"] < 200:
                     brojOpcije = pozicijaiID["id"]
+                elif pozicijaiID["id"] >= 200:
+                    brojCetkice = pozicijaiID["id"]
                 else:
                     raise NameError("pogresan id dugmeta")
                 obojiAktivnoDugmeFunc(pozicijaiID["id"], pozicijaiID["pozicija"])
-        return (brojAlgoritma, brojOpcije)
+        return (brojAlgoritma, brojOpcije, brojCetkice)
     return handleButtonPressInternal
 
 def main():
@@ -39,8 +42,8 @@ def main():
     obojKvadratFunc = GUI.obojKvadrat(kvadrati, ekran)
     obojAktivnoDugmeFunc = GUI.obojiAktivnoDugme(ekran)
     handleButtonPressFunc = handleButtonPress(ekran, pozicijeiIDDugmica, obojAktivnoDugmeFunc)
-    obojPutRadaFunc = viz.obojiPut(True, ekran)
-    obojNajkraciPut = viz.obojiPut(False, ekran)
+    obojPutRadaFunc = viz.obojiPut(True, ekran, alg.nadjiKvadratUGridu)
+    obojNajkraciPut = viz.obojiPut(False, ekran, alg.nadjiKvadratUGridu)
 
     running = True
 
@@ -49,17 +52,17 @@ def main():
             if ev.type == pg.QUIT:
                 running = False
             if ev.type == pg.MOUSEBUTTONUP:
-                pozicijeObojenihKvadrata = obojKvadratFunc()
-                (brojAlgoritma, brojOpcije) = handleButtonPressFunc()
+                (brojAlgoritma, brojOpcije, brojCetkice) = handleButtonPressFunc()
+                pozicijeObojenihKvadrata = obojKvadratFunc(brojCetkice)
 
         if brojAlgoritma != -1 and brojOpcije == 100:
-            (najkraciPut, predjeniNodeovi) = alg.switchAlgoritma(brojAlgoritma, pozicijeObojenihKvadrata, kvadrati)
+            (najkraciPut, predjeniNodeovi, nodeGrid2d) = alg.switchAlgoritma(brojAlgoritma, pozicijeObojenihKvadrata, kvadrati)
             brojOpcije = -1
         if brojOpcije == 101:
             return main()
 
         if predjeniNodeovi != None and nacrtanPut == False and nacrtanNajkraciPut == False:
-            nacrtanPut = obojPutRadaFunc(predjeniNodeovi)
+            nacrtanPut = obojPutRadaFunc(predjeniNodeovi, nodeGrid2d)
         if najkraciPut != None and nacrtanPut == True and nacrtanNajkraciPut == False:
             nacrtanNajkraciPut = obojNajkraciPut(najkraciPut)
 

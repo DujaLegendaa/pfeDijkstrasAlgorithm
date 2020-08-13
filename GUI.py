@@ -14,7 +14,12 @@ dugmiciZaGui = [{"id": 0, "fontVelicina": 40, "text": "BFS", "boja": (0, 0, 0), 
                 {"id": 3, "fontVelicina": 40, "text": "A*", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": False},
 
                 {"id": 100, "fontVelicina": 52, "text": "Start", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": True},
-                {"id": 101, "fontVelicina": 52, "text": "Reset", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": True}
+                {"id": 101, "fontVelicina": 52, "text": "Reset", "boja": (0, 0, 0), "backgroundBoja": (67, 183, 250), "veliki": True},
+
+                {"id": 200, "fontVelicina": 32, "text": "Voda 2", "boja": (0, 0, 0), "backgroundBoja": (52, 210, 235), "veliki": False},
+                {"id": 201, "fontVelicina": 32, "text": "Planine 4", "boja": (0, 0, 0), "backgroundBoja": (133, 101, 13), "veliki": False},
+                {"id": 202, "fontVelicina": 32, "text": "Brda 3", "boja": (0, 0, 0), "backgroundBoja": (227, 176, 34), "veliki": False},
+                {"id": 203, "fontVelicina": 32, "text": "Led 0.3", "boja": (0, 0, 0), "backgroundBoja": (114, 242, 214), "veliki": False},
 ]
 
 def main(sirina, visina, GUIdodatak, velicinaKvadrata):
@@ -39,8 +44,8 @@ def nacrtajDugmice(ekran, dugmiciZaCrtanjeArr):
     for dugme in dugmiciZaCrtanjeArr:
         internalRect = dugme[0].get_rect()
         internalRect.center = (dugme[1].centerx, dugme[1].centery)
-        pg.draw.rect(ekran, (67, 183, 250), dugme[1])
-        pg.draw.rect(ekran, (0,0,0), dugme[1], 1)
+        pg.draw.rect(ekran, dugmiciZaGui[dugmiciZaCrtanjeArr.index(dugme)]["backgroundBoja"], dugme[1])
+        pg.draw.rect(ekran, dugmiciZaGui[dugmiciZaCrtanjeArr.index(dugme)]["boja"], dugme[1], 1)
         ekran.blit(dugme[0], internalRect)
 
 def nacrtajGrid(ekran, brojKvadrataUOsi, velicinaKvadrata):
@@ -55,25 +60,49 @@ def nacrtajGrid(ekran, brojKvadrataUOsi, velicinaKvadrata):
     return kvadrati
 
 def obojKvadrat(kvadrati, ekran):
-    pozicijeObojenihKvadrata = []
+    pozicijeObojenihKvadrata = {
+        "pocetak":None,
+        "kraj": None,
+        "blokirane" : [],
+        "voda": [],
+        "planine": [],
+        "brda": [],
+        "led": [],
+    }
     nacrtanPocetak = False
     nacrtanKraj = False
-    def obojKvadratInternal():
+    def obojKvadratInternal(brojCetkice):
         nonlocal nacrtanKraj, nacrtanPocetak, pozicijeObojenihKvadrata
         posMisa = pg.mouse.get_pos()
 
         for kvadrat in kvadrati:
             if kvadrat.collidepoint(posMisa):
                 if nacrtanPocetak == False:
-                    bojaKvadrata = boje["bojaPKvadrata"]
-                    nacrtanPocetak = True
+                        bojaKvadrata = boje["bojaPKvadrata"]
+                        pozicijeObojenihKvadrata["pocetak"] = kvadrat
+                        nacrtanPocetak = True
                 elif nacrtanKraj == False:
                     bojaKvadrata = boje["bojaKKvadrata"]
+                    pozicijeObojenihKvadrata["kraj"] = kvadrat
                     nacrtanKraj = True
                 else:
-                    bojaKvadrata = boje["bojaPrepreke"]
+                    if brojCetkice == 200:
+                        bojaKvadrata = findInDugmiciArr(200)["backgroundBoja"]
+                        pozicijeObojenihKvadrata["voda"].append(kvadrat)
+                    if brojCetkice == 201:
+                        bojaKvadrata = findInDugmiciArr(201)["backgroundBoja"]
+                        pozicijeObojenihKvadrata["planine"].append(kvadrat)
+                    if brojCetkice == 202:
+                        bojaKvadrata = findInDugmiciArr(202)["backgroundBoja"]
+                        pozicijeObojenihKvadrata["brda"].append(kvadrat)
+                    if brojCetkice == 203:
+                        bojaKvadrata = findInDugmiciArr(203)["backgroundBoja"]
+                        pozicijeObojenihKvadrata["led"].append(kvadrat)
+                    elif brojCetkice == -1:
+                        bojaKvadrata = boje["bojaPrepreke"]
+                        pozicijeObojenihKvadrata["blokirane"].append(kvadrat)
+                    
                 pg.draw.rect(ekran, bojaKvadrata, kvadrat, 0)
-                pozicijeObojenihKvadrata.append(kvadrat)
         return pozicijeObojenihKvadrata
     return obojKvadratInternal
 
@@ -92,7 +121,7 @@ def dobijDugmiceZaCrtanje(GUIdodatak, visina, dugmiciList, fontIme, topPadding, 
 
     return dugmiciRectArr
 
-def odrediMestoDugmeta(GUIdodatak, visina, topPadding, leftPadding, visinaVelikog = 100, visinaMalog = 75):
+def odrediMestoDugmeta(GUIdodatak, visina, topPadding, leftPadding, visinaVelikog = 85, visinaMalog = 60):
     ostaloVisine = visina
     ostaloSirine = GUIdodatak
     def odrediMestoDugmetaInternal(veliki):
@@ -172,5 +201,12 @@ def obojiAktivnoDugme(ekran):
 
     return obojiAktivnoDugmeInternal
 
+
+
+def findInDugmiciArr(id):
+    for el in dugmiciZaGui:
+        if el["id"] == id:
+            return el
+    raise NameError("pogresan id dugmeta")
 
 
